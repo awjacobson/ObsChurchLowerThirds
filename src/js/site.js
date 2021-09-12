@@ -1,6 +1,12 @@
+const services = Object.freeze([
+    { title: "Sunday Morning Worship", day: 0, hours: 10, minutes: 30 }, // Sundays at 10:30 AM
+    { title: "Sunday Evening Bible Study", day: 0, hours: 18, minutes: 0 }, // Sundays at 6:00 PM
+    { title: "Wednesday Bible Study", day: 3, hours: 18, minutes: 30 } // Wednesdays at 6:30 PM
+]);
+
 (function() {
     initCountdown();
-})();
+})();    
 
 function initCountdown() {
     const nextService = getNextService(new Date());
@@ -60,60 +66,47 @@ function stopCountdown() {
 }
 
 /**
- * Gets the next service
- * 
+ * Gets the next service that will happen from the list of services
  * @param {date} now 
  * @returns {*}
  */
 function getNextService(now) {
-    let nextServices = [
-        { title: 'Sunday Morning Worship', date: getSundayMorning(new Date(now)) },
-        { title: 'Sunday Evening Bible Study', date: getSundayEvening(new Date(now)) },
-        { title: 'Wednesday Bible Study', date: getWednesdayEvening(new Date(now)) }
-    ].sort((a,b) => a.date - b.date);
-    return nextServices[0];
+    const nextServices = services.map(x => ({
+        title: x.title,
+        date: getNextDate(now, x.day, x.hours, x.minutes)
+    }));
+    return nextServices.sort((a,b) => a.date - b.date)[0];
 }
 
 /**
- * Gets the date and time for the next Sunday morning service
- * 
- * @param {date} now Current date and time
- * @return {date} The date and time for the next Sunday morning service
- */
-function getSundayMorning(now) {
-    const nextDate = nextWeekdayDate(now, 7);
-    nextDate.setHours(10,30,0);
-    return nextDate;
-}
-
-/**
- * Gets the date and time for the next Sunday evening service
- * 
- * @param {date} now Current date and time
- * @return {date} The date and time for the next Sunday evening service
- */
-function getSundayEvening(now) {
-    const nextDate = nextWeekdayDate(now, 7);
-    nextDate.setHours(6,0,0);
-    return nextDate;
-}
-
-/**
- * Gets the date and time for the next Wednesday evening service
- * 
- * @param {date} now Current date and time
- * @return {date} The date and time for the next Wednesday evening service
- */
- function getWednesdayEvening(now) {
-    const nextDate = nextWeekdayDate(now, 3);
-    nextDate.setHours(6,30,0);
-    return nextDate;
-}
-
-/**
- * 
+ * Get the date and time of the next day of the week and time (could be current date)
  * @param {date} date 
- * @param {number} day_in_week 1=Monday, 2=Tuesday, 3=Wednesday, ..., 7=Sunday
+ * @param {number} day_in_week 
+ * @param {number} hours 
+ * @param {number} minutes 
+ * @returns 
+ */
+function getNextDate(date, day_in_week, hours, minutes) {
+    const currDate = new Date(date);
+    const currDay = currDate.getDay();
+    if (currDay === day_in_week) {
+        const currHours = currDate.getHours();
+        const currMinutes = currDate.getMinutes();
+        if (hours >= currHours || (hours === currHours && minutes >= currMinutes)) {
+            currDate.setHours(hours, minutes, 0);
+            return currDate; 
+        }
+    }
+
+    const nextDate = nextWeekdayDate(date, day_in_week);
+    nextDate.setHours(hours, minutes, 0);
+    return nextDate
+}
+
+/**
+ * Get the date of the next day in week
+ * @param {date} date 
+ * @param {number} day_in_week 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, ..., 6=Saturday
  * @returns 
  */
 function nextWeekdayDate(date, day_in_week) {
