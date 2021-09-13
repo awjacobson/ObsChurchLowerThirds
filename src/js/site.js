@@ -68,13 +68,10 @@ function stopCountdown() {
 /**
  * Gets the next service that will happen from the list of services
  * @param {date} now 
- * @returns {*}
+ * @returns {*} The service object which will occur next
  */
 function getNextService(now) {
-    const nextServices = services.map(x => ({
-        title: x.title,
-        date: getNextDate(now, x.day, x.hours, x.minutes)
-    }));
+    const nextServices = services.map(service => ({ ...service, date: getNextDate(now, service.day, service.hours, service.minutes) }));
     return nextServices.sort((a,b) => a.date - b.date)[0];
 }
 
