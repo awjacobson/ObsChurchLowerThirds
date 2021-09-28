@@ -6,6 +6,10 @@ This is a browser based plugin for OBS Studio. This plugin is intended to be use
 
 Tested on Windows and not sure of MacOs compatibility.
 
+Example:
+
+![alt text](./docs/example.png "Plugin in action!")
+
 ## Installation
 
 1. Extract the .zip file to a known location.
